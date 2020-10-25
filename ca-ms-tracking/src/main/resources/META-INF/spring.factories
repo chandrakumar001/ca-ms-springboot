@@ -1,0 +1,2 @@
+org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
+com.chstore.ca.ms.tracking.CHTrackingAutoConfig

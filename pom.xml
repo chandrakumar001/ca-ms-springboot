@@ -1,0 +1,187 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.chstore.ca</groupId>
+    <artifactId>ca-ms-parent</artifactId>
+    <version>2.0.0</version>
+
+    <packaging>pom</packaging>
+    <name>ca-ms</name>
+    <description>Demo project for Spring Boot</description>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.3.4.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <version.ca-ms-parent>2.0.0</version.ca-ms-parent>
+        <version.java>11</version.java>
+        <!-- build-time versions -->
+        <version.sonar-maven-plugin>3.4.0.905</version.sonar-maven-plugin>
+        <version.jacoco-maven-plugin>0.8.6</version.jacoco-maven-plugin>
+    </properties>
+
+    <modules>
+        <module>ca-ms-bean-annotation</module>
+        <module>ca-ms-bom</module>
+        <module>ca-ms-error</module>
+        <module>ca-ms-feign</module>
+        <module>ca-ms-logging</module>
+        <module>ca-ms-mapper</module>
+        <module>ca-ms-database-connection</module>
+        <module>ca-ms-tracking</module>
+        <module>ca-ms-token</module>
+    </modules>
+
+    <!-- Runtime -->
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-token</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-tracking</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-database-connection</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-bean-annotation</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-bom</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-error</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-feign</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-logging</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.chstore.ca</groupId>
+                <artifactId>ca-ms-mapper</artifactId>
+                <version>${version.ca-ms-parent}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-failsafe-plugin</artifactId>
+                </plugin>
+                <plugin>
+                    <groupId>org.jacoco</groupId>
+                    <artifactId>jacoco-maven-plugin</artifactId>
+                    <version>${version.jacoco-maven-plugin}</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.sonarsource.scanner.maven</groupId>
+                    <artifactId>sonar-maven-plugin</artifactId>
+                    <version>${version.sonar-maven-plugin}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+
+    <profiles>
+        <profile>
+            <id>quality-checks</id>
+            <properties>
+                <sonar.host.url>http://localhost:9000</sonar.host.url>
+                <sonar.projectVersion>${project.version}</sonar.projectVersion>
+                <sonar.profile>CA_MS</sonar.profile>
+                <sonar.sources>src/main</sonar.sources>
+                <sonar.tests>src/test</sonar.tests>
+                <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
+                <sonar.dynamicAnalysis>reuseReports</sonar.dynamicAnalysis>
+                <sonar.exclusions>**/dto/*.java</sonar.exclusions>
+            </properties>
+
+            <build>
+                <pluginManagement>
+                    <plugins>
+                        <plugin>
+                            <groupId>org.jacoco</groupId>
+                            <artifactId>jacoco-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>agent</id>
+                                    <goals>
+                                        <goal>prepare-agent</goal>
+                                    </goals>
+                                    <configuration>
+                                        <destFile>${sonar.jacoco.reportPath}</destFile>
+                                        <append>true</append>
+                                    </configuration>
+                                </execution>
+                            </executions>
+                        </plugin>
+                        <plugin>
+                            <groupId>org.sonarsource.scanner.maven</groupId>
+                            <artifactId>sonar-maven-plugin</artifactId>
+                            <executions>
+                                <execution>
+                                    <id>sonar</id>
+                                    <phase>verify</phase>
+                                    <goals>
+                                        <goal>sonar</goal>
+                                    </goals>
+                                </execution>
+                            </executions>
+                        </plugin>
+                    </plugins>
+                </pluginManagement>
+            </build>
+        </profile>
+    </profiles>
+
+    <repositories>
+        <repository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
+        </repository>
+    </repositories>
+
+    <pluginRepositories>
+        <pluginRepository>
+            <snapshots>
+                <enabled>false</enabled>
+            </snapshots>
+            <id>central</id>
+            <name>bintray</name>
+            <url>https://jcenter.bintray.com</url>
+        </pluginRepository>
+    </pluginRepositories>
+</project>
