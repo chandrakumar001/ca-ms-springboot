@@ -1,10 +1,12 @@
 package com.chstore.ca.ms.tracking;
 
 import org.slf4j.MDC;
+import org.springframework.util.StringUtils;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.UUID;
 
 public class CHRequestContext {
@@ -13,6 +15,9 @@ public class CHRequestContext {
 
     private boolean isInitialised;
     private String requestId;
+    private String externalId;
+    private String businessTxId;
+
     private String jwt;
 
     private String requestUri;
@@ -23,26 +28,6 @@ public class CHRequestContext {
     private boolean isForwardJwt;
     private boolean isForwardTracking;
 
-
-    private static String defineHeader(final HttpServletRequest httpServletRequest,
-                                       final HttpServletResponse httpServletResponse,
-                                       final CHRequestHeader chRequestHeader,
-                                       final String defaultValue) {
-
-        final String headerName = chRequestHeader.getHeaderName();
-        final String requestValue = httpServletRequest.getHeader(headerName);
-
-        if (requestValue == null || requestValue.isEmpty()) {
-            MDC.put(headerName, defaultValue);
-            httpServletResponse.setHeader(headerName, defaultValue);
-            return defaultValue;
-        }
-
-        MDC.put(headerName, requestValue);
-        httpServletResponse.setHeader(headerName, requestValue);
-        return requestValue;
-    }
-
     public void init(final HttpServletRequest request,
                      final HttpServletResponse response) {
         if (isInitialised) {
@@ -50,12 +35,15 @@ public class CHRequestContext {
         }
         this.isInitialised = true;
         this.requestId = getRequestId(request, response);
+        this.externalId = getExternalId(request, response);
+        this.businessTxId = getBusinessTxId(request, response);
+
         this.requestUri = request.getRequestURI();
         this.verb = request.getMethod();
+
         this.isForwardJwt = true;
         this.isForwardTracking = true;
     }
-
 
     public String getUserId() {
         return userId;
@@ -73,8 +61,12 @@ public class CHRequestContext {
         return verb;
     }
 
-    public String getJwt() {
-        return jwt;
+    public Optional<String> getJwt() {
+        return Optional.ofNullable(jwt);
+    }
+
+    public boolean isUnknownUser() {
+        return !getJwt().isPresent();
     }
 
     public boolean isForwardJwt() {
@@ -89,15 +81,47 @@ public class CHRequestContext {
         return requestId;
     }
 
-    private String getRequestId(HttpServletRequest httpServletRequest,
-                                HttpServletResponse httpServletResponse) {
+    private String getBusinessTxId(final HttpServletRequest httpServletRequest,
+                                   final HttpServletResponse httpServletResponse) {
+        return defineHeader(httpServletRequest, httpServletResponse,
+                CHRequestHeader.BUSINESS_ID, UUID.randomUUID().toString());
+    }
 
-        return defineHeader(
-                httpServletRequest,
-                httpServletResponse,
-                CHRequestHeader.CO_RELATION_ID,
-                UUID.randomUUID().toString()
-        );
+    private String getExternalId(final HttpServletRequest httpServletRequest,
+                                 final HttpServletResponse httpServletResponse) {
+
+        return defineHeader(httpServletRequest, httpServletResponse,
+                CHRequestHeader.EXTERNAL_ID, null);
+    }
+
+    private String getRequestId(final HttpServletRequest httpServletRequest,
+                                final HttpServletResponse httpServletResponse) {
+
+        return defineHeader(httpServletRequest, httpServletResponse,
+                CHRequestHeader.REQUEST_ID, UUID.randomUUID().toString());
+    }
+
+    private static String defineHeader(final HttpServletRequest httpServletRequest,
+                                       final HttpServletResponse httpServletResponse,
+                                       final CHRequestHeader chRequestHeader,
+                                       final String defaultValue) {
+
+        final String headerName = chRequestHeader.getHeaderName();
+        final String requestValue = httpServletRequest.getHeader(headerName);
+
+        final String resultingValue;
+        if (StringUtils.isEmpty(requestValue)) {
+            resultingValue = defaultValue;
+        } else {
+            resultingValue = requestValue;
+        }
+
+        //result value null check: by default external ID is null
+        if (resultingValue != null) {
+            MDC.put(headerName, resultingValue);
+            httpServletResponse.setHeader(headerName, resultingValue);
+        }
+        return resultingValue;
     }
 
     private CHRequestLanguage getLang(HttpServletRequest httpServletRequest,

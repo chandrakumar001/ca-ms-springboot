@@ -3,7 +3,9 @@ package com.chstore.ca.ms.tracking;
 public enum CHRequestHeader {
 
     LANGUAGE("lang"),
-    CO_RELATION_ID("Correlation-id"),
+    EXTERNAL_ID("X-External-ID"),
+    REQUEST_ID("X-Request-ID"),
+    BUSINESS_ID("X-BusinessTx-ID"),
     JWT_TOKEN("Authorization");
 
     private final String headerName;

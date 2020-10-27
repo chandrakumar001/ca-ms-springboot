@@ -22,7 +22,7 @@ public class CHFeignInterceptor implements RequestInterceptor {
             requestTemplate.header("authorization", String.format("%s", chRequestContext.getJwt()));
         }
         if (chRequestContext.isForwardTracking()) {
-            requestTemplate.header(CHRequestHeader.CO_RELATION_ID.getHeaderName(), chRequestContext.getRequestId());
+            requestTemplate.header(CHRequestHeader.BUSINESS_ID.getHeaderName(), chRequestContext.getRequestId());
         }
     }
 }
