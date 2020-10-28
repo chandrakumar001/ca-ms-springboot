@@ -13,6 +13,7 @@ public class CHRequestContext {
 
     public static final String USER_ID = "userId";
 
+    // tracking
     private boolean isInitialised;
     private String requestId;
     private String externalId;
@@ -38,6 +39,7 @@ public class CHRequestContext {
         this.externalId = getExternalId(request, response);
         this.businessTxId = getBusinessTxId(request, response);
 
+        this.jwt = jwt;
         this.requestUri = request.getRequestURI();
         this.verb = request.getMethod();
 
@@ -79,6 +81,14 @@ public class CHRequestContext {
 
     public String getRequestId() {
         return requestId;
+    }
+
+    public Optional<String> getExternalId() {
+        return Optional.ofNullable(externalId);
+    }
+
+    public String getBusinessTxId() {
+        return businessTxId;
     }
 
     private String getBusinessTxId(final HttpServletRequest httpServletRequest,

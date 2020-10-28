@@ -18,11 +18,18 @@ public class CHFeignInterceptor implements RequestInterceptor {
     public void apply(final RequestTemplate requestTemplate) {
 
         requestTemplate.header("Accept", MediaType.APPLICATION_JSON_VALUE);
+
         if (chRequestContext.isForwardJwt()) {
-            requestTemplate.header("authorization", String.format("%s", chRequestContext.getJwt()));
+            chRequestContext.getJwt()
+                    .ifPresent(jwtToken -> requestTemplate.header(CHRequestHeader.JWT_TOKEN.getHeaderName(), String.format("%s", chRequestContext.getJwt())));
         }
+
         if (chRequestContext.isForwardTracking()) {
-            requestTemplate.header(CHRequestHeader.BUSINESS_ID.getHeaderName(), chRequestContext.getRequestId());
+
+            chRequestContext.getExternalId()
+                    .ifPresent(externalId -> requestTemplate.header(CHRequestHeader.EXTERNAL_ID.getHeaderName(), externalId));
+            requestTemplate.header(CHRequestHeader.REQUEST_ID.getHeaderName(), chRequestContext.getRequestId());
+            //TODO lang
         }
     }
 }
