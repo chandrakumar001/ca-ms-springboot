@@ -2,7 +2,7 @@
 <profile>
    <name>CA_MS</name>
    <language>java</language>
-    <version>1.0.5</version>
+    <version>1.0.8</version>
    <rules>
       <rule>
          <repositoryKey>common-java</repositoryKey>
