@@ -3,7 +3,7 @@
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
 
-    <artifactId>ca-ms-bom</artifactId>
+    <artifactId>ca-ms-springboot-parent</artifactId>
     <packaging>pom</packaging>
 
     <parent>
@@ -137,14 +137,6 @@
         </dependency>
         <dependency>
             <groupId>com.chstore.ca</groupId>
-            <artifactId>ca-ms-database-connection</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.chstore.ca</groupId>
-            <artifactId>ca-ms-bean-annotation</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.chstore.ca</groupId>
             <artifactId>ca-ms-tracking</artifactId>
         </dependency>
         <dependency>
@@ -158,10 +150,6 @@
         <dependency>
             <groupId>com.chstore.ca</groupId>
             <artifactId>ca-ms-logging</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>com.chstore.ca</groupId>
-            <artifactId>ca-ms-mapper</artifactId>
         </dependency>
     </dependencies>
 
