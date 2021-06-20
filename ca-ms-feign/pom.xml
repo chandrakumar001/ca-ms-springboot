@@ -2,16 +2,19 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>ca-ms-feign</artifactId>
+
     <parent>
         <groupId>com.chstore.ca</groupId>
         <artifactId>ca-ms-parent</artifactId>
         <version>3.0.0</version>
         <relativePath>..</relativePath>
     </parent>
+
     <properties>
-        <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
+        <spring-cloud.version>Hoxton.SR11</spring-cloud.version>
     </properties>
-    <artifactId>ca-ms-feign</artifactId>
 
     <dependencies>
         <dependency>
@@ -22,6 +25,7 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-web</artifactId>
         </dependency>
+        <!-- issue maven/commons-io/commons-io@2.5, cpe:2.3:a:apache:commons_io:2.5 -->
         <dependency>
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
