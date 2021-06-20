@@ -9,15 +9,25 @@
     <parent>
         <groupId>com.chstore.ca</groupId>
         <artifactId>ca-ms-parent</artifactId>
-        <version>2.0.0</version>
+        <version>3.0.0</version>
         <relativePath>..</relativePath>
     </parent>
+
     <properties>
-        <version.ca-ms-parent>2.0.0</version.ca-ms-parent>
+        <version.ca-ms-parent>3.0.0</version.ca-ms-parent>
         <spring-cloud.version>Greenwich.RELEASE</spring-cloud.version>
         <mapstruct.version>1.3.1.Final</mapstruct.version>
+        <openapi-ui.version>1.5.9</openapi-ui.version>
+        <!--karate | Unit test case-->
         <karate.version>0.9.5</karate.version>
         <karate.report.version>3.8.0</karate.report.version>
+        <!--groovy and groovy version | Unit test case -->
+        <groovy.version>3.0.8</groovy.version>
+        <spring-spock.version>2.0-groovy-3.0</spring-spock.version>
+        <!--plugin.version-->
+        <surefire-plugin.version>3.0.0-M5</surefire-plugin.version>
+        <build-helper-maven.version>3.2.0</build-helper-maven.version>
+        <gmavenplus-plugin.version>1.12.1</gmavenplus-plugin.version>
     </properties>
 
     <dependencies>
@@ -61,7 +71,7 @@
         <dependency>
             <groupId>org.springdoc</groupId>
             <artifactId>springdoc-openapi-ui</artifactId>
-            <version>1.4.8</version>
+            <version>${openapi-ui.version}</version>
         </dependency>
         <!--Integration Test-->
         <dependency>
@@ -93,31 +103,24 @@
             <groupId>org.springframework.cloud</groupId>
             <artifactId>spring-cloud-starter-openfeign</artifactId>
         </dependency>
-        <!--Unit Testing framework-->
+        <!--Unit test dependency -->
+        <!--Unit test dependency groovy and spock -->
+        <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy</artifactId>
+            <version>${groovy.version}</version>
+        </dependency>
         <dependency>
             <groupId>org.spockframework</groupId>
             <artifactId>spock-core</artifactId>
-            <version>1.0-groovy-2.4</version>
+            <version>${spring-spock.version}</version>
             <scope>test</scope>
         </dependency>
-        <dependency> <!-- enables mocking of classes(in addition to interfaces) -->
-            <groupId>cglib</groupId>
-            <artifactId>cglib-nodep</artifactId>
-            <version>3.1</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency> <!-- enables mocking of classes without default
-            constructor (together with CGLIB) -->
-            <groupId>org.objenesis</groupId>
-            <artifactId>objenesis</artifactId>
-            <version>2.1</version>
-            <scope>test</scope>
-        </dependency>
-        <!-- https://mvnrepository.com/artifact/org.codehaus.groovy.modules.http-builder/http-builder -->
         <dependency>
-            <groupId>org.codehaus.groovy.modules.http-builder</groupId>
-            <artifactId>http-builder</artifactId>
-            <version>0.6</version>
+            <groupId>org.spockframework</groupId>
+            <artifactId>spock-spring</artifactId>
+            <version>${spring-spock.version}</version>
+            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -156,14 +159,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${version.java}</source>
-                    <target>${version.java}</target>
-                </configuration>
-            </plugin>
-            <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
@@ -174,44 +169,98 @@
                     </execution>
                 </executions>
             </plugin>
+            <!-- Unit test execution plugin -->
+            <!-- https://maven.apache.org/surefire/maven-surefire-plugin/examples/spock.html-->
+            <plugin>
+                <groupId>org.codehaus.gmavenplus</groupId>
+                <artifactId>gmavenplus-plugin</artifactId>
+                <version>${gmavenplus-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>compileTests</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>${surefire-plugin.version}</version>
+                <executions>
+                    <execution>
+                        <id>unit-tests</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <skipTests>false</skipTests>
+                            <includes>
+                                <include>**/*Spec.java</include>
+                                <include>**/*Tests.java</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>integration-tests</id>
+                        <phase>integration-test</phase>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/*IT.*</include>
+                            </includes>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>verify</id>
                         <goals>
-                            <goal>integration-test</goal>
                             <goal>verify</goal>
                         </goals>
                     </execution>
                 </executions>
             </plugin>
             <plugin>
-                <groupId>org.jacoco</groupId>
-                <artifactId>jacoco-maven-plugin</artifactId>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>build-helper-maven-plugin</artifactId>
+                <version>${build-helper-maven.version}</version>
                 <executions>
                     <execution>
-                        <id>agent</id>
+                        <id>add-integration-test-sources</id>
+                        <phase>generate-test-sources</phase>
                         <goals>
-                            <goal>prepare-agent</goal>
+                            <goal>add-test-source</goal>
                         </goals>
                         <configuration>
-                            <destFile>${sonar.jacoco.reportPath}</destFile>
-                            <append>true</append>
+                            <sources>
+                                <source>src/integration-test/java</source>
+                                <source>src/integration-test/groovy</source>
+                            </sources>
                         </configuration>
                     </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.sonarsource.scanner.maven</groupId>
-                <artifactId>sonar-maven-plugin</artifactId>
-                <executions>
+                    <!-- Add a new resource directory to our build -->
                     <execution>
-                        <id>sonar</id>
-                        <phase>verify</phase>
+                        <id>add-integration-test-resources</id>
+                        <phase>generate-test-resources</phase>
                         <goals>
-                            <goal>sonar</goal>
+                            <goal>add-test-resource</goal>
                         </goals>
+                        <configuration>
+                            <resources>
+                                <resource>
+                                    <filtering>true</filtering>
+                                    <directory>src/integration-test/resources</directory>
+                                </resource>
+                            </resources>
+                        </configuration>
                     </execution>
                 </executions>
             </plugin>
